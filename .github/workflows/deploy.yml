@@ -1,10 +1,40 @@
 name: Deploy to Production
 
+# ==============================================================================
+# DEPLOYMENT WORKFLOW - REQUIRES CONFIGURATION
+# ==============================================================================
+# 
+# This workflow is designed for when you have production infrastructure set up.
+# 
+# REQUIRED GITHUB SECRETS:
+# - PRODUCTION_HOST: Your production server hostname/IP
+# - PRODUCTION_USER: SSH username for production server
+# - PRODUCTION_SSH_KEY: SSH private key for authentication
+# - STAGING_HOST: Your staging server hostname/IP (optional)
+# - STAGING_USER: SSH username for staging server (optional)
+# - STAGING_SSH_KEY: SSH private key for staging (optional)
+# - SMOKE_TEST_API_KEY: API key for smoke tests (optional)
+# 
+# SETUP INSTRUCTIONS:
+# 1. Set up your production servers (see docs/DEPLOYMENT.md)
+# 2. Add GitHub secrets in: Settings → Secrets → Actions
+# 3. Uncomment the 'push' trigger below to enable auto-deploy
+# 4. Update URLs (agenticai.example.com) to your domain
+# 
+# ==============================================================================
+
+# This workflow is designed for when you have production infrastructure set up
+# For template users: Configure GitHub secrets first, then enable this workflow
+# See docs/DEPLOYMENT.md for setup instructions
+
 on:
-  push:
-    branches: [ main ]
-    tags:
-      - 'v*.*.*'
+  # Disabled by default for template - uncomment when ready
+  # push:
+  #   branches: [ main ]
+  #   tags:
+  #     - 'v*.*.*'
+  
+  # Manual deployment only until secrets are configured
   workflow_dispatch:
     inputs:
       environment:
