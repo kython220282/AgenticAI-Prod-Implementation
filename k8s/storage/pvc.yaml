@@ -1,0 +1,33 @@
+# Persistent Volume Claims
+# =========================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agenticai-data
+  namespace: agenticai
+  labels:
+    app: agenticai
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chromadb-data
+  namespace: agenticai
+  labels:
+    app: chromadb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 20Gi

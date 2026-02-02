@@ -1,0 +1,62 @@
+{{- if .Values.api.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "agenticai.fullname" . }}-api
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "agenticai.labels" . | nindent 4 }}
+    component: api
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "agenticai.selectorLabels" . | nindent 6 }}
+      component: api
+  template:
+    metadata:
+      labels:
+        {{- include "agenticai.selectorLabels" . | nindent 8 }}
+        component: api
+    spec:
+      serviceAccountName: {{ include "agenticai.serviceAccountName" . }}
+      containers:
+      - name: api
+        image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: {{ include "agenticai.fullname" . }}-config
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "agenticai.fullname" . }}-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "agenticai.fullname" . }}-secrets
+              key: redis-url
+        resources:
+          {{- toYaml .Values.api.resources | nindent 10 }}
+        {{- if .Values.api.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.api.livenessProbe.path }}
+            port: 8000
+          initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
+        {{- end }}
+        {{- if .Values.api.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.api.readinessProbe.path }}
+            port: 8000
+          initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
+        {{- end }}
+{{- end }}

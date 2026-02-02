@@ -1,0 +1,84 @@
+# Celery Worker Deployment
+# =========================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agenticai-worker
+  namespace: agenticai
+  labels:
+    app: agenticai
+    component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agenticai
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: agenticai
+        component: worker
+    spec:
+      serviceAccountName: agenticai
+      containers:
+      - name: worker
+        image: ghcr.io/your-org/agenticai:latest
+        imagePullPolicy: Always
+        command: ["celery"]
+        args:
+          - "-A"
+          - "src.api.celery_app"
+          - "worker"
+          - "--loglevel=info"
+          - "--concurrency=4"
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: agenticai-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: agenticai-secrets
+              key: redis-url
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            secretKeyRef:
+              name: agenticai-secrets
+              key: celery-broker-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: agenticai-secrets
+              key: secret-key
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: agenticai-secrets
+              key: openai-api-key
+              optional: true
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: agenticai-secrets
+              key: anthropic-api-key
+              optional: true
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: agenticai-data

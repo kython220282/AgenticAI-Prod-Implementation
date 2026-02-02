@@ -1,0 +1,115 @@
+# LLM Configuration
+# This file contains settings for Large Language Models and related services
+
+llm:
+  # Provider selection: openai, anthropic, huggingface, local
+  provider: "openai"
+  
+  # OpenAI Settings
+  openai:
+    model: "gpt-4-turbo-preview"
+    api_key_env: "OPENAI_API_KEY"
+    temperature: 0.7
+    max_tokens: 2000
+    top_p: 1.0
+    frequency_penalty: 0.0
+    presence_penalty: 0.0
+    
+  # Anthropic Settings
+  anthropic:
+    model: "claude-3-opus-20240229"
+    api_key_env: "ANTHROPIC_API_KEY"
+    temperature: 0.7
+    max_tokens: 2000
+    
+  # Embeddings
+  embeddings:
+    provider: "openai"  # openai, huggingface, sentence-transformers
+    model: "text-embedding-3-large"
+    dimension: 1536
+    batch_size: 100
+
+# Vector Database Configuration
+vector_store:
+  # Provider: chroma, pinecone, weaviate, faiss
+  provider: "chroma"
+  
+  # Chroma Settings
+  chroma:
+    persist_directory: "./data/vector_db/chroma"
+    collection_name: "agent_memory"
+    
+  # Pinecone Settings
+  pinecone:
+    api_key_env: "PINECONE_API_KEY"
+    environment: "gcp-starter"
+    index_name: "agent-memory"
+    dimension: 1536
+    metric: "cosine"
+    
+  # Weaviate Settings
+  weaviate:
+    url: "http://localhost:8080"
+    api_key_env: "WEAVIATE_API_KEY"
+    class_name: "AgentMemory"
+    
+  # FAISS Settings
+  faiss:
+    index_path: "./data/vector_db/faiss_index"
+    index_type: "IVFFlat"  # Flat, IVFFlat, HNSW
+
+# Prompt Templates Configuration
+prompts:
+  # Template directory
+  template_dir: "./config/prompts"
+  
+  # Template settings
+  settings:
+    max_length: 8000
+    truncate_strategy: "end"  # start, end, middle
+    include_examples: true
+    
+  # System prompts
+  system_prompts:
+    default: "You are a helpful AI assistant with reasoning capabilities."
+    reasoning: "You are an AI agent with advanced reasoning and planning abilities. Think step by step."
+    collaborative: "You are part of a team of AI agents. Coordinate with others to achieve goals."
+    
+# Token Tracking
+token_tracking:
+  enabled: true
+  log_file: "./data/logs/token_usage.json"
+  track_by_agent: true
+  track_by_task: true
+  alert_threshold: 100000  # Alert when daily tokens exceed this
+  
+# LangChain Settings
+langchain:
+  verbose: false
+  cache_enabled: true
+  cache_dir: "./data/cache/langchain"
+  
+  # Memory settings
+  memory:
+    type: "buffer"  # buffer, summary, vector
+    max_tokens: 2000
+    
+  # Chain settings
+  chains:
+    max_retries: 3
+    timeout: 60
+
+# LlamaIndex Settings
+llama_index:
+  chunk_size: 512
+  chunk_overlap: 50
+  index_type: "vector"  # vector, list, tree, keyword
+  storage_dir: "./data/llama_index"
+  
+# RAG (Retrieval Augmented Generation)
+rag:
+  enabled: true
+  top_k: 5
+  similarity_threshold: 0.7
+  rerank: true
+  rerank_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"

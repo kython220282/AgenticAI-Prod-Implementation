@@ -1,0 +1,87 @@
+# Logging Configuration
+# =====================
+# This file configures the logging system for the entire Agentic AI project.
+#
+# Usage:
+#   - Set log levels for different modules
+#   - Configure log output formats and destinations
+#   - Define log rotation and retention policies
+
+version: 1
+disable_existing_loggers: false
+
+# Formatters define the log message format
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+    
+  detailed:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s() - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+    
+  json:
+    class: 'pythonjsonlogger.jsonlogger.JsonFormatter'
+    format: '%(asctime)s %(name)s %(levelname)s %(message)s'
+
+# Handlers define where logs are sent
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+    
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: data/logs/agentic_ai.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+    
+  error_file:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed
+    filename: data/logs/errors.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+    
+  performance_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: data/logs/performance.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
+    encoding: utf8
+
+# Loggers for different modules
+loggers:
+  agents:
+    level: DEBUG
+    handlers: [console, file]
+    propagate: false
+    
+  core:
+    level: DEBUG
+    handlers: [console, file]
+    propagate: false
+    
+  environment:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+    
+  performance:
+    level: INFO
+    handlers: [performance_file]
+    propagate: false
+
+# Root logger configuration
+root:
+  level: INFO
+  handlers: [console, file, error_file]

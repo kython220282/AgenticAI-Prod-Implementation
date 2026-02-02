@@ -1,0 +1,57 @@
+# Agent Configuration
+# ===================
+# This file defines the configuration for different agent types in the system.
+# 
+# Usage:
+#   - Define agent behaviors, capabilities, and parameters
+#   - Configure communication protocols between agents
+#   - Set reasoning and decision-making thresholds
+
+agent:
+  # Base agent configuration
+  base:
+    type: "BaseAgent"
+    max_iterations: 100
+    timeout: 300  # seconds
+    
+  # Autonomous agent settings
+  autonomous:
+    type: "AutonomousAgent"
+    autonomy_level: 0.8  # 0.0 to 1.0
+    decision_threshold: 0.7
+    exploration_rate: 0.2
+    max_consecutive_actions: 50
+    
+  # Learning agent configuration
+  learning:
+    type: "LearningAgent"
+    learning_rate: 0.001
+    discount_factor: 0.95
+    epsilon_start: 1.0
+    epsilon_end: 0.01
+    epsilon_decay: 0.995
+    batch_size: 32
+    memory_size: 10000
+    
+  # Reasoning agent settings
+  reasoning:
+    type: "ReasoningAgent"
+    reasoning_depth: 5
+    inference_engine: "forward_chaining"
+    confidence_threshold: 0.75
+    max_reasoning_time: 30  # seconds
+    
+  # Collaborative agent configuration
+  collaborative:
+    type: "CollaborativeAgent"
+    team_size: 5
+    communication_protocol: "message_passing"
+    coordination_strategy: "hierarchical"
+    conflict_resolution: "voting"
+
+# Global agent settings
+global:
+  enable_logging: true
+  log_level: "INFO"
+  enable_metrics: true
+  checkpoint_frequency: 100  # iterations

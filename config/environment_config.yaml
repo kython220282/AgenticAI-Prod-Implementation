@@ -1,0 +1,66 @@
+# Environment Configuration
+# =========================
+# This file defines the simulation environment settings for agent training and testing.
+#
+# Usage:
+#   - Configure simulation parameters
+#   - Define environment constraints and rules
+#   - Set reward structures for reinforcement learning
+
+environment:
+  # Basic environment settings
+  type: "simulation"
+  name: "AgenticAIEnvironment"
+  version: "1.0.0"
+  
+  # Simulation parameters
+  simulation:
+    timestep: 0.1  # seconds
+    max_steps: 1000
+    real_time: false
+    seed: 42  # for reproducibility
+    
+  # State space configuration
+  state_space:
+    type: "continuous"
+    dimensions: 10
+    bounds:
+      min: -1.0
+      max: 1.0
+    normalize: true
+    
+  # Action space configuration
+  action_space:
+    type: "discrete"
+    num_actions: 8
+    # For continuous: dimensions: 4
+    
+  # Reward configuration
+  reward:
+    type: "sparse"  # sparse or dense
+    goal_reward: 100.0
+    step_penalty: -0.1
+    collision_penalty: -10.0
+    success_bonus: 50.0
+    
+  # Environment constraints
+  constraints:
+    max_velocity: 10.0
+    max_acceleration: 5.0
+    collision_detection: true
+    boundary_type: "wall"  # wall, wrap, or infinite
+    
+# Multi-agent environment settings
+multi_agent:
+  enabled: false
+  num_agents: 3
+  observation_radius: 5.0
+  communication_enabled: true
+  cooperative: true
+  
+# Rendering configuration
+rendering:
+  enabled: false
+  mode: "human"  # human, rgb_array, or none
+  fps: 30
+  resolution: [800, 600]

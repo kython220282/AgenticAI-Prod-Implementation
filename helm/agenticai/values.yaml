@@ -1,0 +1,221 @@
+# Default values for agenticai
+# =============================
+
+# Global settings
+global:
+  imageRegistry: ghcr.io
+  imagePullSecrets: []
+  
+# Namespace
+namespace: agenticai
+
+# Image configuration
+image:
+  repository: your-org/agenticai
+  tag: latest
+  pullPolicy: Always
+
+# API deployment
+api:
+  replicaCount: 3
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    enabled: true
+    path: /health/live
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  
+  readinessProbe:
+    enabled: true
+    path: /health/ready
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+# Worker deployment
+worker:
+  replicaCount: 2
+  
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 75
+  
+  celery:
+    concurrency: 4
+    loglevel: info
+
+# PostgreSQL
+postgresql:
+  enabled: true
+  image:
+    tag: 15-alpine
+  
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: standard
+  
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+  
+  auth:
+    database: agenticai_db
+    username: agenticai
+    # Password should be set via secrets
+
+# Redis
+redis:
+  enabled: true
+  image:
+    tag: 7-alpine
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: standard
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  
+  config:
+    maxmemory: "2gb"
+    maxmemoryPolicy: "allkeys-lru"
+
+# Ingress
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  
+  hosts:
+    - host: api.agenticai.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  
+  tls:
+    - secretName: agenticai-tls
+      hosts:
+        - api.agenticai.example.com
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+# Storage
+persistence:
+  enabled: true
+  storageClass: standard
+  accessMode: ReadWriteMany
+  size: 50Gi
+
+# Configuration
+config:
+  appName: "Agentic AI"
+  appEnv: production
+  appDebug: false
+  logLevel: INFO
+  
+  api:
+    v1Prefix: "/api/v1"
+    corsOrigins: "https://app.agenticai.example.com"
+  
+  database:
+    poolSize: 20
+    maxOverflow: 10
+  
+  redis:
+    maxConnections: 50
+  
+  features:
+    vectorSearch: true
+    agentExecution: true
+    asyncTasks: true
+  
+  rateLimit:
+    perMinute: 100
+    burst: 20
+
+# Secrets (use external secrets in production)
+secrets:
+  # These should be provided via sealed-secrets or external-secrets
+  secretKey: ""
+  jwtSecretKey: ""
+  databaseUrl: ""
+  redisUrl: ""
+  
+  # Optional API keys
+  openaiApiKey: ""
+  anthropicApiKey: ""
+  pineconeApiKey: ""
+
+# Network policies
+networkPolicy:
+  enabled: true
+
+# Service Account
+serviceAccount:
+  create: true
+  name: agenticai
+  annotations: {}
+
+# Monitoring
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

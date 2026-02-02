@@ -1,0 +1,17 @@
+apiVersion: v2
+name: agenticai
+description: A Helm chart for Agentic AI Framework
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ai
+  - agents
+  - llm
+  - machine-learning
+home: https://github.com/your-org/agenticai
+sources:
+  - https://github.com/your-org/agenticai
+maintainers:
+  - name: Your Team
+    email: team@agenticai.example.com

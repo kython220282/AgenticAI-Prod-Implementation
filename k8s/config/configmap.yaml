@@ -1,0 +1,43 @@
+# ConfigMap for Application Configuration
+# =========================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agenticai-config
+  namespace: agenticai
+data:
+  # Application settings
+  APP_NAME: "Agentic AI"
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  LOG_LEVEL: "INFO"
+  
+  # API settings
+  API_V1_PREFIX: "/api/v1"
+  CORS_ORIGINS: "https://app.agenticai.example.com,https://www.agenticai.example.com"
+  
+  # Database settings
+  POOL_SIZE: "20"
+  MAX_OVERFLOW: "10"
+  POOL_PRE_PING: "true"
+  
+  # Redis settings
+  REDIS_MAX_CONNECTIONS: "50"
+  
+  # Celery settings
+  CELERY_TASK_TIME_LIMIT: "3600"
+  CELERY_WORKER_PREFETCH_MULTIPLIER: "1"
+  
+  # Feature flags
+  FEATURE_VECTOR_SEARCH: "true"
+  FEATURE_AGENT_EXECUTION: "true"
+  FEATURE_ASYNC_TASKS: "true"
+  
+  # Monitoring
+  METRICS_ENABLED: "true"
+  SENTRY_ENABLED: "true"
+  
+  # Rate limiting
+  RATE_LIMIT_PER_MINUTE: "100"
+  RATE_LIMIT_BURST: "20"

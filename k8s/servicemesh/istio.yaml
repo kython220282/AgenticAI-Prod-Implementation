@@ -1,0 +1,293 @@
+# Istio Service Mesh Configuration
+# ==================================
+
+# Install Istio first:
+# curl -L https://istio.io/downloadIstio | sh -
+# cd istio-*
+# export PATH=$PWD/bin:$PATH
+# istioctl install --set profile=production -y
+
+---
+# Enable Istio sidecar injection for namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agenticai
+  labels:
+    istio-injection: enabled
+
+---
+# Gateway for ingress traffic
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: agenticai-gateway
+  namespace: agenticai
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: agenticai-tls
+    hosts:
+    - api.agenticai.example.com
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - api.agenticai.example.com
+    tls:
+      httpsRedirect: true
+
+---
+# VirtualService for routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: agenticai-api
+  namespace: agenticai
+spec:
+  hosts:
+  - api.agenticai.example.com
+  gateways:
+  - agenticai-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/v1
+    route:
+    - destination:
+        host: agenticai-api
+        port:
+          number: 8000
+        subset: v1
+      weight: 100
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+      retryOn: 5xx,reset,connect-failure,refused-stream
+    timeout: 30s
+    corsPolicy:
+      allowOrigins:
+      - exact: https://app.agenticai.example.com
+      allowMethods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      allowHeaders:
+      - authorization
+      - content-type
+      allowCredentials: true
+      maxAge: 24h
+
+---
+# DestinationRule for load balancing and circuit breaking
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: agenticai-api
+  namespace: agenticai
+spec:
+  host: agenticai-api
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: x-user-id
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 40
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+    trafficPolicy:
+      connectionPool:
+        tcp:
+          maxConnections: 100
+        http:
+          http1MaxPendingRequests: 50
+
+---
+# PeerAuthentication for mTLS
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: agenticai
+spec:
+  mtls:
+    mode: STRICT
+
+---
+# AuthorizationPolicy for access control
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: agenticai-api-authz
+  namespace: agenticai
+spec:
+  selector:
+    matchLabels:
+      app: agenticai
+      component: api
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        namespaces: ["istio-system"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE"]
+  - from:
+    - source:
+        principals: ["cluster.local/ns/agenticai/sa/agenticai"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+
+---
+# RequestAuthentication for JWT validation
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-auth
+  namespace: agenticai
+spec:
+  selector:
+    matchLabels:
+      app: agenticai
+      component: api
+  jwtRules:
+  - issuer: "https://api.agenticai.example.com"
+    jwksUri: "https://api.agenticai.example.com/.well-known/jwks.json"
+    audiences:
+    - "agenticai-api"
+
+---
+# ServiceEntry for external APIs
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: openai-api
+  namespace: agenticai
+spec:
+  hosts:
+  - api.openai.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: anthropic-api
+  namespace: agenticai
+spec:
+  hosts:
+  - api.anthropic.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+
+---
+# Telemetry configuration
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: mesh-telemetry
+  namespace: agenticai
+spec:
+  tracing:
+  - providers:
+    - name: jaeger
+    randomSamplingPercentage: 100.0
+    customTags:
+      environment:
+        literal:
+          value: production
+      service_name:
+        literal:
+          value: agenticai
+  metrics:
+  - providers:
+    - name: prometheus
+    dimensions:
+      request_protocol: request.protocol
+      response_code: response.code
+      connection_mtls: connection.mtls
+
+---
+# EnvoyFilter for custom headers
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: custom-headers
+  namespace: agenticai
+spec:
+  workloadSelector:
+    labels:
+      app: agenticai
+      component: api
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_OUTBOUND
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.http_connection_manager
+            subFilter:
+              name: envoy.filters.http.router
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.lua
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          inline_code: |
+            function envoy_on_request(request_handle)
+              request_handle:headers():add("x-custom-header", "agenticai")
+            end
+
+---
+# Sidecar for resource optimization
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: agenticai-sidecar
+  namespace: agenticai
+spec:
+  workloadSelector:
+    labels:
+      app: agenticai
+  egress:
+  - hosts:
+    - "./*"
+    - "istio-system/*"
+    - "*/api.openai.com"
+    - "*/api.anthropic.com"

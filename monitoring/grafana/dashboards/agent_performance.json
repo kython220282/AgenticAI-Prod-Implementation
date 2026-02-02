@@ -1,0 +1,138 @@
+{
+  "dashboard": {
+    "title": "Agentic AI - Agent Performance",
+    "tags": ["agentic-ai", "agents"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "type": "graph",
+        "title": "Agent Execution Rate",
+        "targets": [
+          {
+            "expr": "rate(agent_executions_total[5m])",
+            "legendFormat": "{{agent_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "ops", "label": "Executions/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 2,
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "type": "graph",
+        "title": "Agent Execution Duration",
+        "targets": [
+          {
+            "expr": "avg(agent_execution_duration_seconds) by (agent_type)",
+            "legendFormat": "{{agent_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Duration"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 3,
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8},
+        "type": "stat",
+        "title": "Total Executions",
+        "targets": [
+          {
+            "expr": "sum(agent_executions_total)",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area"
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 8},
+        "type": "stat",
+        "title": "Success Rate",
+        "targets": [
+          {
+            "expr": "sum(rate(agent_executions_total{status=\"success\"}[5m])) / sum(rate(agent_executions_total[5m])) * 100",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "unit": "percent",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "type": "graph",
+        "title": "Token Usage",
+        "targets": [
+          {
+            "expr": "rate(agent_tokens_used_total[5m])",
+            "legendFormat": "{{agent_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Tokens/sec"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 6,
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "type": "graph",
+        "title": "Agent Cost (USD)",
+        "targets": [
+          {
+            "expr": "sum(agent_cost_usd_total) by (agent_type)",
+            "legendFormat": "{{agent_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {"format": "currencyUSD", "label": "Cost"},
+          {"format": "short"}
+        ]
+      },
+      {
+        "id": 7,
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "type": "table",
+        "title": "Agent Execution Summary",
+        "targets": [
+          {
+            "expr": "sum by (agent_type) (agent_executions_total)",
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "agent_type": "Agent Type",
+                "Value": "Total Executions"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
