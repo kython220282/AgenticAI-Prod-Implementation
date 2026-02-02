@@ -1,40 +1,100 @@
 name: Deploy to Production
 
 # ==============================================================================
-# DEPLOYMENT WORKFLOW - REQUIRES CONFIGURATION
+# DEPLOYMENT WORKFLOW - REQUIRES INFRASTRUCTURE SETUP
 # ==============================================================================
-# 
-# This workflow is designed for when you have production infrastructure set up.
-# 
-# REQUIRED GITHUB SECRETS:
-# - PRODUCTION_HOST: Your production server hostname/IP
-# - PRODUCTION_USER: SSH username for production server
-# - PRODUCTION_SSH_KEY: SSH private key for authentication
-# - STAGING_HOST: Your staging server hostname/IP (optional)
-# - STAGING_USER: SSH username for staging server (optional)
-# - STAGING_SSH_KEY: SSH private key for staging (optional)
-# - SMOKE_TEST_API_KEY: API key for smoke tests (optional)
-# 
-# SETUP INSTRUCTIONS:
-# 1. Set up your production servers (see docs/DEPLOYMENT.md)
-# 2. Add GitHub secrets in: Settings → Secrets → Actions
-# 3. Uncomment the 'push' trigger below to enable auto-deploy
-# 4. Update URLs (agenticai.example.com) to your domain
-# 
+#
+# ⚠️  CURRENTLY DISABLED - Manual deployment only via workflow_dispatch
+#
+# This workflow is for production deployment and requires infrastructure setup.
+# It is DISABLED by default for template users.
+#
+# TO ACTIVATE AUTOMATED DEPLOYMENT:
+# ==================================
+#
+# STEP 1: SET UP INFRASTRUCTURE
+# ------------------------------
+# □ Provision production server (AWS EC2, DigitalOcean, etc.)
+# □ Install Docker and docker-compose on the server
+# □ Clone repository to server: /opt/agenticai
+# □ Set up firewall rules (ports 80, 443, 22)
+# □ Configure domain DNS to point to server IP
+# □ Install SSL certificates (Let's Encrypt recommended)
+#
+# STEP 2: CONFIGURE SSH ACCESS
+# ----------------------------
+# □ Generate SSH key pair: ssh-keygen -t ed25519 -C "github-actions"
+# □ Add public key to server: ~/.ssh/authorized_keys
+# □ Test SSH connection: ssh user@your-server.com
+# □ Keep private key for GitHub Secrets (next step)
+#
+# STEP 3: ADD GITHUB SECRETS
+# --------------------------
+# Go to: Settings → Secrets and variables → Actions → New repository secret
+#
+# Required secrets:
+# □ PRODUCTION_HOST: Your production server IP or hostname
+# □ PRODUCTION_USER: SSH username (e.g., ubuntu, deploy)
+# □ PRODUCTION_SSH_KEY: Private SSH key (paste entire key including headers)
+#
+# Optional secrets (for staging environment):
+# □ STAGING_HOST: Staging server IP or hostname
+# □ STAGING_USER: SSH username for staging
+# □ STAGING_SSH_KEY: Private SSH key for staging
+# □ SMOKE_TEST_API_KEY: API key for post-deployment smoke tests
+#
+# STEP 4: UPDATE DEPLOYMENT CONFIGURATION
+# ---------------------------------------
+# In this file, update the following:
+# □ Line 115, 138: Replace 'agenticai.example.com' with your domain
+# □ Line 86, 112: Replace '/opt/agenticai' if using different path
+# □ Verify docker-compose.yml matches your configuration
+#
+# STEP 5: ENABLE AUTO-DEPLOYMENT
+# ------------------------------
+# In this file, uncomment lines 74-77 (the 'push:' trigger)
+# This will enable automatic deployment on push to main branch
+#
+# STEP 6: TEST MANUAL DEPLOYMENT FIRST
+# ------------------------------------
+# □ Go to: Actions → Deploy to Production → Run workflow
+# □ Select 'staging' or 'production'
+# □ Monitor the deployment
+# □ Verify application is running: https://your-domain.com/health
+#
+# STEP 7: VERIFY AUTOMATED DEPLOYMENT
+# -----------------------------------
+# □ Make a small change and push to main branch
+# □ Watch Actions tab for automatic deployment
+# □ Check deployment logs for any issues
+# □ Verify rollback works if deployment fails
+#
+# TROUBLESHOOTING:
+# ---------------
+# - SSH connection fails: Check firewall rules and SSH key permissions
+# - Docker build fails: Test docker-compose build locally first
+# - Health check fails: Check application logs: docker-compose logs
+# - See docs/DEPLOYMENT.md for detailed troubleshooting guide
+#
 # ==============================================================================
 
-# This workflow is designed for when you have production infrastructure set up
-# For template users: Configure GitHub secrets first, then enable this workflow
-# See docs/DEPLOYMENT.md for setup instructions
+# DEPLOYMENT TRIGGERS - CURRENTLY DISABLED FOR TEMPLATE USERS
 
 on:
-  # Disabled by default for template - uncomment when ready
+  # ============================================================================
+  # AUTOMATIC DEPLOYMENT (DISABLED)
+  # ============================================================================
+  # Uncomment the lines below AFTER completing all setup steps above
+  # This will trigger deployment automatically when pushing to main branch
+  #
   # push:
   #   branches: [ main ]
   #   tags:
   #     - 'v*.*.*'
+  # ============================================================================
   
-  # Manual deployment only until secrets are configured
+  # MANUAL DEPLOYMENT (ENABLED)
+  # Use this to test deployment before enabling automatic triggers
   workflow_dispatch:
     inputs:
       environment:

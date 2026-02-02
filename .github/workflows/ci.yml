@@ -1,5 +1,51 @@
 name: CI Pipeline
 
+# ==============================================================================
+# CONTINUOUS INTEGRATION WORKFLOW - TEMPLATE CONFIGURATION
+# ==============================================================================
+#
+# This CI workflow is currently running in "template mode" with continue-on-error
+# enabled on most steps. This allows the template to work out-of-the-box without
+# failing on missing dependencies or configuration.
+#
+# TO ACTIVATE FULL CI/CD FOR YOUR PROJECT:
+# ========================================
+#
+# 1. INSTALL DEPENDENCIES:
+#    - Ensure all packages in requirements.txt are installable
+#    - Add any missing dependencies your project needs
+#    - Test locally: pip install -r requirements.txt
+#
+# 2. FIX CODE FORMATTING:
+#    - Run: black src/ tests/
+#    - Run: isort src/ tests/
+#    - Run: flake8 src/ tests/ --max-line-length=100
+#
+# 3. FIX TYPE ISSUES:
+#    - Run: mypy src/ --ignore-missing-imports
+#    - Address type errors or add type: ignore comments
+#
+# 4. ENSURE TESTS PASS:
+#    - Run: pytest tests/ -v
+#    - Fix any failing tests
+#    - Add tests for new features
+#
+# 5. CONFIGURE ENVIRONMENT:
+#    - Set up .env file with required variables
+#    - Ensure Docker and docker-compose work locally
+#    - Test: docker-compose up -d
+#
+# 6. REMOVE continue-on-error FLAGS:
+#    - Search this file for "continue-on-error: true"
+#    - Remove or set to false for steps that should fail on error
+#    - Commit changes to enable strict CI checks
+#
+# 7. OPTIONAL - ADD SECRETS (for advanced features):
+#    - CODECOV_TOKEN: For code coverage reporting
+#    - Go to: Settings → Secrets → Actions → New repository secret
+#
+# ==============================================================================
+
 on:
   push:
     branches: [ main, develop ]

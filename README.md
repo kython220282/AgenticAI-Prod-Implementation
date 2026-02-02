@@ -1,6 +1,6 @@
 # Agentic AI Project Structure
 
-**By: Karan Raj Sharma and Mr. Brij Kishor**
+**By: Karan Raj Sharma. Notes from Mr. Brij Kishor(https://www.linkedin.com/in/brijpandeyji/) were refered**
 
 [![Use this template](https://img.shields.io/badge/Use%20this%20template-2ea44f?style=for-the-badge)](https://github.com/kython220282/AgenticAI-Prod-Implementation/generate)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -668,6 +668,9 @@ All documentation is available in the `docs/` folder and on GitHub:
 - 🚀 **[Getting Started Guide](docs/GETTING_STARTED.md)** - Complete setup tutorial with examples  
   [View on GitHub](https://github.com/kython220282/AgenticAI-Prod-Implementation/blob/main/docs/GETTING_STARTED.md)
 
+- ⚙️ **[CI/CD Activation Guide](docs/CI_CD_ACTIVATION.md)** - Step-by-step CI/CD pipeline setup and configuration  
+  [View on GitHub](https://github.com/kython220282/AgenticAI-Prod-Implementation/blob/main/docs/CI_CD_ACTIVATION.md)
+
 #### **Production Deployment Guides**
 - 🐳 **[Phase 1: Production Essentials](docs/PHASE1_COMPLETE.md)** - FastAPI, Docker, authentication, monitoring  
   [View on GitHub](https://github.com/kython220282/AgenticAI-Prod-Implementation/blob/main/docs/PHASE1_COMPLETE.md)
@@ -687,10 +690,10 @@ All documentation is available in the `docs/` folder and on GitHub:
 ### 🎯 Learning Paths
 
 **🟢 Beginner Path:**  
-Start with [Getting Started Guide](docs/GETTING_STARTED.md) → Run examples → Customize configurations → Create your first agent
+Start with [Getting Started Guide](docs/GETTING_STARTED.md) → Run examples → [Activate CI/CD](docs/CI_CD_ACTIVATION.md) → Customize configurations → Create your first agent
 
 **🟡 Intermediate Path:**  
-Integrate LLMs → Build multi-agent systems → Deploy with [Phase 1](docs/PHASE1_COMPLETE.md) → Set up CI/CD with [Phase 2](docs/PHASE2_COMPLETE.md)
+Integrate LLMs → Build multi-agent systems → [Activate CI/CD](docs/CI_CD_ACTIVATION.md) → Deploy with [Phase 1](docs/PHASE1_COMPLETE.md) → Set up infrastructure with [Phase 2](docs/PHASE2_COMPLETE.md)
 
 **🔴 Advanced Path:**  
 Kubernetes deployment with [Phase 3](docs/PHASE3_COMPLETE.md) → Multi-region setup → Enterprise observability → Auto-scaling
@@ -700,6 +703,7 @@ Kubernetes deployment with [Phase 3](docs/PHASE3_COMPLETE.md) → Multi-region s
 | Document | Description | Topics Covered |
 |----------|-------------|----------------|
 | [Getting Started](docs/GETTING_STARTED.md) | Beginner-friendly tutorial | Setup, first agent, examples, troubleshooting |
+| [CI/CD Activation](docs/CI_CD_ACTIVATION.md) | Pipeline setup guide | GitHub Actions, secrets, deployment automation |
 | [Phase 1](docs/PHASE1_COMPLETE.md) | Production basics (31 files) | FastAPI, Docker, JWT auth, Celery, Prometheus |
 | [Phase 2](docs/PHASE2_COMPLETE.md) | Infrastructure (40+ files) | CI/CD, SQLAlchemy, Alembic, Pytest, backups |
 | [Phase 3](docs/PHASE3_COMPLETE.md) | Enterprise (20+ files) | Kubernetes, Helm, Istio, OpenTelemetry, secrets |
@@ -742,9 +746,6 @@ Special thanks to the open-source AI community!
 ---
 
 **⭐ Star this repo if you find it useful!**
-## 📝 License
-
-[Add your license here]
 
 ## 👥 Contributing
 
