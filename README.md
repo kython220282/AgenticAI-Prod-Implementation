@@ -1,6 +1,6 @@
 # Agentic AI Project Structure
 
-**By: Karan Raj Sharma. Notes from Mr. Brij Kishor(https://www.linkedin.com/in/brijpandeyji/) were refered**
+**By: Karan Raj Sharma. Structure Template published by from Mr. Brij Kishor(https://www.linkedin.com/in/brijpandeyji/) was refered**
 
 [![Use this template](https://img.shields.io/badge/Use%20this%20template-2ea44f?style=for-the-badge)](https://github.com/kython220282/AgenticAI-Prod-Implementation/generate)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
